@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santo Barbero - Panel de Control</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(218, 165, 32, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #DAA520 0%, #FFD700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(218, 165, 32, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(218, 165, 32, 0.5);
+        }
+
+        .stat-card h3 {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #DAA520 0%, #FFD700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(218, 165, 32, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .section h2 {
+            margin-bottom: 1.5rem;
+            color: #DAA520;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            color: #DAA520;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status.pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #FFC107;
+        }
+
+        .status.completed {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .status.cancelled {
+            background: rgba(244, 67, 54, 0.2);
+            color: #F44336;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #DAA520 0%, #FFD700 100%);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(218, 165, 32, 0.3);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>🦅 Santo Barbero - Panel de Control</h1>
+    </div>
+
+    <div class="container">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Citas</h3>
+                <div class="value">
+                    <%= stats.totalAppointments %>
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>Citas Hoy</h3>
+                <div class="value">
+                    <%= stats.todayAppointments %>
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Clientes</h3>
+                <div class="value">
+                    <%= stats.totalClients %>
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>Ingresos Totales</h3>
+                <div class="value">$<%= stats.totalRevenue.toLocaleString() %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Citas Recientes -->
+        <div class="section">
+            <h2>📅 Citas Recientes</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Servicio</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Precio</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% recentAppointments.forEach(apt=> { %>
+                        <tr>
+                            <td>
+                                <%= apt.name %>
+                            </td>
+                            <td>
+                                <%= apt.service %>
+                            </td>
+                            <td>
+                                <%= apt.date %>
+                            </td>
+                            <td>
+                                <%= apt.time %>
+                            </td>
+                            <td>$<%= apt.price %>
+                            </td>
+                            <td><span class="status <%= apt.status %>">
+                                    <%= apt.status %>
+                                </span></td>
+                        </tr>
+                        <% }); %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Marketing -->
+        <div class="section">
+            <h2>📢 Marketing Automation</h2>
+            <p style="margin-bottom: 1rem; color: #aaa;">Gestiona tus campañas y recordatorios automáticos</p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="launchCampaign()">
+                    🚀 Campaña de Reactivación
+                </button>
+                <button class="btn btn-primary" onclick="sendReminders()">
+                    ⏰ Enviar Recordatorios Ahora
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function launchCampaign() {
+            if (confirm('¿Enviar mensaje a clientes que no han venido en 21+ días?')) {
+                fetch('/api/marketing/campaign', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: 'Hermano, hace tiempo que no pasas por el Santuario. 20% de descuento hoy si agendas.',
+                        targetDays: 21
+                    })
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(`✅ Campaña enviada a ${data.sent} de ${data.total} clientes`);
+                        } else {
+                            alert(`❌ Error: ${data.error}`);
+                        }
+                    })
+                    .catch(err => alert('Error: ' + err.message));
+            }
+        }
+
+        function sendReminders() {
+            if (confirm('¿Enviar recordatorios a clientes con citas mañana?')) {
+                fetch('/api/marketing/reminders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(`✅ Recordatorios enviados: ${data.sent}`);
+                        } else {
+                            alert(`❌ Error: ${data.error}`);
+                        }
+                    })
+                    .catch(err => alert('Error: ' + err.message));
+            }
+        }
+    </script>
+</body>
+
+</html>

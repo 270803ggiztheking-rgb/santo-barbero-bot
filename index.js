@@ -46,11 +46,98 @@ async function start() {
     const app = express();
     const PORT = process.env.PORT || 3000;
 
+    // Global variable to store QR
+    let currentQR = null;
+
     // Middleware
     app.use(express.json());
 
     // Routes
     app.get('/', (req, res) => res.json({ status: 'Santo Bot Online', service: 'Santuario Digital' }));
+
+    // QR Code endpoint
+    app.get('/qr', (req, res) => {
+        if (!currentQR) {
+            res.send(`
+                <html>
+                    <head>
+                        <title>Santo Bot - QR Code</title>
+                        <style>
+                            body {
+                                background: #0a0a0a;
+                                color: #d4af37;
+                                font-family: 'Courier New', monospace;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                height: 100vh;
+                                margin: 0;
+                                text-align: center;
+                            }
+                            .container {
+                                padding: 40px;
+                                border: 2px solid #d4af37;
+                                border-radius: 10px;
+                            }
+                            h1 { color: #d4af37; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h1>🦅 Santo Bot</h1>
+                            <p>Esperando código QR...</p>
+                            <p>El bot se está iniciando. Recarga esta página en unos segundos.</p>
+                        </div>
+                    </body>
+                </html>
+            `);
+        } else {
+            res.send(`
+                <html>
+                    <head>
+                        <title>Santo Bot - QR Code</title>
+                        <style>
+                            body {
+                                background: #0a0a0a;
+                                color: #d4af37;
+                                font-family: 'Courier New', monospace;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                height: 100vh;
+                                margin: 0;
+                                flex-direction: column;
+                            }
+                            .qr-container {
+                                background: white;
+                                padding: 20px;
+                                border-radius: 10px;
+                                margin: 20px;
+                            }
+                            pre {
+                                font-size: 8px;
+                                line-height: 8px;
+                                margin: 0;
+                            }
+                            h1 { color: #d4af37; margin-bottom: 10px; }
+                            p { color: #888; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>🦅 Santo Bot - Escanea el QR</h1>
+                        <p>Abre WhatsApp → Dispositivos vinculados → Vincular dispositivo</p>
+                        <div class="qr-container">
+                            <pre>${currentQR}</pre>
+                        </div>
+                        <p>Una vez escaneado, esta página se actualizará automáticamente</p>
+                        <script>
+                            setTimeout(() => location.reload(), 10000);
+                        </script>
+                    </body>
+                </html>
+            `);
+        }
+    });
 
     // Payment routes
     const paymentRoutes = require('./payment-routes');
@@ -80,13 +167,18 @@ async function start() {
 
     let conversationState = {};
 
-    client.on('qr', qt => {
+    client.on('qr', qr => {
         console.log('📱 ESCANEA EL CÓDIGO PARA VINCULAR EL ESPÍRITU:');
-        qrcode.generate(qt, { small: true });
+        qrcode.generate(qr, { small: true });
+
+        // Store QR for web display
+        currentQR = qr;
+        console.log(`\n🌐 También puedes ver el QR en: http://76.13.25.51:${PORT}/qr\n`);
     });
 
     client.on('ready', async () => {
         console.log('🦅 El Guardián está despierto. Santo Barbero operativo.');
+        currentQR = null; // Clear QR once authenticated
 
         // Inicializar Marketing Engine
         const marketing = new MarketingEngine(client);

@@ -64,7 +64,7 @@ async function start() {
         authStrategy: new LocalAuth({ dataPath: './session' }),
         puppeteer: {
             headless: true,
-            executablePath: isLinux ? '/usr/bin/chromium-browser' : undefined,
+            executablePath: isLinux ? require('puppeteer').executablePath() : undefined,
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         }
     });
